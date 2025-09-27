@@ -4,7 +4,7 @@ from google import genai
 from google.genai import types
 from dotenv import load_dotenv
 from prompts import system_prompt
-from call_function import available_functions
+from call_function import available_functions, call_function
 
 def main():
     load_dotenv()
@@ -33,7 +33,7 @@ def main():
     types.Content(role="user", parts=[types.Part(text=user_prompt)]),
     ]
 
-    generate_content(client, messages, verbose)
+    print(generate_content(client, messages, verbose))
 
 
 def generate_content(client, messages, verbose):
@@ -52,9 +52,27 @@ def generate_content(client, messages, verbose):
     if not response.function_calls:
         return response.text
 
-
     for function_call_part in response.function_calls:
-        print(f"Calling function: {function_call_part.name}({function_call_part.args})")
+        function_call_result = call_function(function_call_part, verbose)
+        
+        try:
+            actual_response_content = function_call_result.parts[0].function_response.response
+            if verbose:
+                print(f"-> {actual_response_content["result"]}")
+        except (AttributeError, IndexError) as e:
+            raise Exception(f"Unexpected function call result structure: {e}")
+        
+        messages.append(function_call_result)
+        
+    response = client.models.generate_content(
+        model='gemini-2.0-flash-001', 
+        contents=messages,
+        config=types.GenerateContentConfig(
+            tools=[available_functions], system_instruction=system_prompt
+            ),
+    )
+    return response.text
+            
 
 
 if __name__ == "__main__":

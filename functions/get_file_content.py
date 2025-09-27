@@ -1,6 +1,6 @@
 import os
 from google.genai import types
-from .config import *
+from .config import MAX_CHARS
 
 def get_file_content(working_directory, file_path):
     full_path = os.path.join(working_directory, file_path)

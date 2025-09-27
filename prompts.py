@@ -8,5 +8,5 @@ When a user asks a question or makes a request, make a function call plan. You c
 - Execute Python files with optional arguments
 - Write or overwrite files
 
-All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons. When listing files in the working directory, call get_files_info with directory='.'.
+All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons. When listing files in the working directory, call get_files_info with directory='.'. When a user asks to "run" a Python file, call run_python_file and provide the file_path from the user's request.
 """
